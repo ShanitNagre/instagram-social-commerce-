@@ -9,7 +9,7 @@
 
 ## 🔗 Live Prototype
 
-**[Open ShopReel Interactive Prototype →](https://shanitnagre.github.io/instagram-social-commerce/05-shopreel-prototype.html)**
+**[Open ShopReel Interactive Prototype →](https://shanitnagre.github.io/instagram-social-commerce-/05-shopreel-prototype.html)**
 
 Works on desktop and mobile. See AI product identification, the shop dot, product shelf, and one-tap checkout in action.
 
