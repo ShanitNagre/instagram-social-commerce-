@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Instagram ShopReel — AI Commerce Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ig-pink: #e1306c;
+  --ig-purple: #833ab4;
+  --ig-orange: #fd1d1d;
+  --ig-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  --black: #000;
+  --white: #fff;
+  --grey: #262626;
+  --light-grey: #fafafa;
+  --border: #dbdbdb;
+  --text: #262626;
+  --muted: #8e8e8e;
+  --green: #1db954;
+  --blue: #0095f6;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #f0f0f0;
+  font-family: 'Inter', -apple-system, sans-serif;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  min-height: 100vh; padding: 32px 16px;
+}
+
+.proto-label {
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #888; margin-bottom: 20px; text-align: center;
+  font-weight: 500;
+}
+.proto-label span {
+  background: white; padding: 6px 16px; border-radius: 20px;
+  border: 1px solid #ddd;
+}
+
+/* PHONE */
+.phone {
+  width: 393px; background: var(--black);
+  border-radius: 50px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.35), 0 0 0 10px #1a1a1a, 0 0 0 12px #333;
+  overflow: hidden; position: relative;
+}
+
+/* STATUS */
+.status {
+  background: var(--black); color: white;
+  padding: 14px 28px 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; font-weight: 600;
+}
+.status-time { font-size: 15px; }
+
+/* HEADER */
+.ig-header {
+  background: var(--black);
+  padding: 8px 16px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ig-logo {
+  color: white; font-size: 22px; font-weight: 700;
+  font-family: 'Inter', sans-serif; letter-spacing: -0.5px;
+}
+.ig-header-icons { display: flex; gap: 18px; }
+.ig-header-icons span { font-size: 22px; cursor: pointer; }
+
+/* STORIES */
+.stories {
+  background: var(--black);
+  padding: 8px 12px 16px;
+  display: flex; gap: 12px; overflow-x: auto;
+}
+.stories::-webkit-scrollbar { display: none; }
+.story { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; cursor: pointer; }
+.story-ring {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--ig-gradient); padding: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.story-inner {
+  width: 58px; height: 58px; border-radius: 50%;
+  background: var(--grey); border: 2px solid var(--black);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; overflow: hidden;
+}
+.story-name { font-size: 10px; color: white; font-weight: 400; }
+
+/* REEL CONTAINER */
+.reel-wrapper {
+  position: relative; background: var(--black);
+  height: 580px; overflow: hidden;
+}
+
+/* REEL VIDEO SIMULATION */
+.reel-bg {
+  width: 100%; height: 100%;
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 40%, #0f3460 70%, #533483 100%);
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px;
+}
+
+/* REEL OVERLAYS */
+.reel-right {
+  position: absolute; right: 12px; bottom: 100px;
+  display: flex; flex-direction: column; gap: 20px; align-items: center;
+}
+.reel-action { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+.reel-action-icon { font-size: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+.reel-action-count { font-size: 11px; color: white; font-weight: 600; }
+
+.reel-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 2px solid white;
+  background: var(--ig-gradient); padding: 2px;
+  cursor: pointer; margin-bottom: 4px;
+}
+.reel-avatar-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: var(--grey); display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.follow-btn {
+  position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+  background: var(--ig-pink); color: white; border: none; border-radius: 50%;
+  width: 20px; height: 20px; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+
+/* REEL BOTTOM INFO */
+.reel-bottom {
+  position: absolute; bottom: 0; left: 0; right: 52px;
+  padding: 16px 16px 20px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+.reel-username { color: white; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.reel-caption { color: rgba(255,255,255,0.9); font-size: 13px; line-height: 1.4; margin-bottom: 8px; }
+.reel-music {
+  display: flex; align-items: center; gap: 6px;
+  color: rgba(255,255,255,0.8); font-size: 12px;
+}
+
+/* SHOP DOT */
+.shop-dot {
+  position: absolute; bottom: 72px; left: 16px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 6px 14px 6px 10px;
+  display: flex; align-items: center; gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.shop-dot:hover { background: rgba(255,255,255,0.25); transform: scale(1.03); }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.2); }
+  50% { box-shadow: 0 0 0 6px rgba(255,255,255,0); }
+}
+.shop-dot-icon { font-size: 16px; }
+.shop-dot-text { color: white; font-size: 12px; font-weight: 600; }
+.shop-dot-count {
+  background: var(--ig-pink); color: white;
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 10px; margin-left: 2px;
+}
+
+/* PRODUCT SHELF */
+.product-shelf {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: white; border-radius: 24px 24px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 20; max-height: 85%;
+  overflow-y: auto;
+}
+.product-shelf.open { transform: translateY(0); }
+.shelf-handle {
+  width: 36px; height: 4px; background: #ddd; border-radius: 2px;
+  margin: 12px auto 0;
+}
+.shelf-header {
+  padding: 12px 16px 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.shelf-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.shelf-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #f0f0f0; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--muted);
+}
+.shelf-sub { padding: 0 16px 12px; font-size: 12px; color: var(--muted); }
+
+/* AI BADGE */
+.ai-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: linear-gradient(135deg, #833ab4, #e1306c);
+  color: white; font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin: 0 16px 12px;
+}
+
+/* PRODUCT CARDS */
+.products-scroll {
+  display: flex; gap: 12px; padding: 0 16px 16px;
+  overflow-x: auto;
+}
+.products-scroll::-webkit-scrollbar { display: none; }
+.product-card {
+  flex-shrink: 0; width: 160px;
+  border: 1px solid var(--border); border-radius: 16px;
+  overflow: hidden; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.product-card:hover { transform: scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.product-card.selected { border: 2px solid var(--ig-pink); }
+.product-img {
+  width: 100%; height: 160px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px;
+}
+.product-info { padding: 10px 10px 12px; }
+.product-brand { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.product-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 4px; }
+.product-price { font-size: 15px; font-weight: 800; color: var(--text); }
+.product-original { font-size: 11px; color: var(--muted); text-decoration: line-through; margin-left: 4px; }
+.product-rating { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* BUY SECTION */
+.buy-section {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px; padding-top: 16px;
+}
+.selected-product-preview {
+  display: flex; gap: 12px; align-items: center; margin-bottom: 14px;
+}
+.sel-img {
+  width: 56px; height: 56px; border-radius: 10px;
+  background: #f8f0ff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; flex-shrink: 0;
+}
+.sel-info { flex: 1; }
+.sel-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.sel-price { font-size: 18px; font-weight: 800; color: var(--text); margin-top: 2px; }
+.size-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.size-btn {
+  padding: 7px 14px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; background: white; color: var(--text);
+  transition: all 0.15s;
+}
+.size-btn.selected { border-color: var(--text); background: var(--text); color: white; }
+.buy-btn {
+  width: 100%; padding: 15px;
+  background: var(--text); color: white;
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: background 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.buy-btn:hover { background: #333; }
+.buy-btn.purchased { background: var(--green); }
+.meta-pay-badge {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-top: 10px; font-size: 11px; color: var(--muted);
+}
+
+/* CREATOR EARNINGS PILL */
+.creator-earnings {
+  margin: 0 16px 14px;
+  background: linear-gradient(135deg, #f9f0ff, #fff0f5);
+  border: 1px solid rgba(131,58,180,0.15);
+  border-radius: 12px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.creator-earnings-icon { font-size: 20px; }
+.creator-earnings-text { font-size: 12px; color: var(--text); line-height: 1.4; }
+.creator-earnings-text strong { color: var(--ig-purple); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  background: var(--black);
+  padding: 10px 0 28px;
+  display: flex;
+}
+.bnav { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+.bnav-icon { font-size: 24px; filter: brightness(0.5); }
+.bnav-icon.active { filter: brightness(1); }
+
+/* SUCCESS MODAL */
+.success-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 50;
+}
+.success-overlay.show { display: flex; }
+.success-card {
+  background: white; border-radius: 24px;
+  padding: 32px 28px; margin: 20px; text-align: center;
+  animation: popIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes popIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+.success-icon { font-size: 56px; margin-bottom: 12px; display: block; }
+.success-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.success-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+.success-btn {
+  background: var(--text); color: white; border: none;
+  padding: 14px 32px; border-radius: 12px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  width: 100%;
+}
+
+/* REELS NAV */
+.reels-nav {
+  background: var(--black); padding: 8px 16px 4px;
+  display: flex; gap: 24px;
+}
+.reel-nav-item {
+  font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5);
+  cursor: pointer; padding-bottom: 4px; border-bottom: 2px solid transparent;
+}
+.reel-nav-item.active { color: white; border-bottom-color: white; }
+
+/* SHIMMER */
+.ai-scanning {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  border-radius: 16px; padding: 16px 24px;
+  color: white; text-align: center;
+  display: none;
+}
+.ai-scanning.show { display: block; }
+.scan-text { font-size: 13px; font-weight: 600; margin-top: 6px; }
+.scan-bar {
+  width: 160px; height: 3px; background: rgba(255,255,255,0.2);
+  border-radius: 2px; margin: 8px auto 0; overflow: hidden;
+}
+.scan-fill {
+  height: 100%; background: var(--ig-gradient);
+  border-radius: 2px; width: 0%;
+  transition: width 1.5s ease;
+}
+</style>
+</head>
+<body>
+
+<div class="proto-label">
+  <span>📱 Interactive Prototype · Instagram ShopReel · Shanit Nagre</span>
+</div>
+
+<div class="phone">
+  <!-- STATUS -->
+  <div class="status">
+    <span class="status-time">9:41</span>
+    <div style="display:flex;gap:6px;font-size:12px">
+      <span>●●●</span><span>WiFi</span><span>🔋</span>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="ig-header">
+    <div class="ig-logo">Instagram</div>
+    <div class="ig-header-icons">
+      <span>♡</span>
+      <span>✉️</span>
+    </div>
+  </div>
+
+  <!-- STORIES -->
+  <div class="stories">
+    <div class="story">
+      <div class="story-ring" style="background:linear-gradient(45deg,#405de6,#5851db,#833ab4)">
+        <div class="story-inner" style="background:#1a1a1a">➕</div>
+      </div>
+      <div class="story-name">Your story</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><div class="story-inner">👗</div></div>
+      <div class="story-name">zara_india</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><div class="story-inner">👟</div></div>
+      <div class="story-name">nike</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><div class="story-inner">💄</div></div>
+      <div class="story-name">nykaa</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><div class="story-inner">🍕</div></div>
+      <div class="story-name">foodie_ria</div>
+    </div>
+    <div class="story">
+      <div class="story-ring"><div class="story-inner">✈️</div></div>
+      <div class="story-name">travel.sv</div>
+    </div>
+  </div>
+
+  <!-- REELS NAV -->
+  <div class="reels-nav">
+    <div class="reel-nav-item" onclick="switchReel(0)">For you</div>
+    <div class="reel-nav-item active" onclick="switchReel(1)">Reels</div>
+    <div class="reel-nav-item" onclick="switchReel(2)">Following</div>
+  </div>
+
+  <!-- REEL -->
+  <div class="reel-wrapper" id="reelWrapper">
+    <!-- BG -->
+    <div class="reel-bg" id="reelBg">🎨</div>
+
+    <!-- AI SCANNING OVERLAY -->
+    <div class="ai-scanning" id="aiScanning">
+      <div style="font-size:28px">🤖</div>
+      <div class="scan-text">AI identifying products...</div>
+      <div class="scan-bar"><div class="scan-fill" id="scanFill"></div></div>
+    </div>
+
+    <!-- RIGHT ACTIONS -->
+    <div class="reel-right">
+      <div style="position:relative">
+        <div class="reel-avatar" onclick="showToast('Viewing profile...')">
+          <div class="reel-avatar-inner">👗</div>
+        </div>
+        <button class="follow-btn">+</button>
+      </div>
+      <div class="reel-action" onclick="likeReel()">
+        <span class="reel-action-icon" id="likeIcon">♡</span>
+        <span class="reel-action-count" id="likeCount">284K</span>
+      </div>
+      <div class="reel-action" onclick="showToast('Comments...')">
+        <span class="reel-action-icon">💬</span>
+        <span class="reel-action-count">4,821</span>
+      </div>
+      <div class="reel-action" onclick="showToast('Shared!')">
+        <span class="reel-action-icon">↗️</span>
+        <span class="reel-action-count">Share</span>
+      </div>
+      <div class="reel-action" onclick="showToast('Saved to collection!')">
+        <span class="reel-action-icon">🔖</span>
+        <span class="reel-action-count">Save</span>
+      </div>
+      <div class="reel-action" onclick="showToast('More options...')">
+        <span class="reel-action-icon">•••</span>
+      </div>
+    </div>
+
+    <!-- BOTTOM INFO -->
+    <div class="reel-bottom">
+      <div class="reel-username" id="reelUsername">@stylebypriya</div>
+      <div class="reel-caption" id="reelCaption">GRWM for a dinner date 🌙 outfit details below ✨ #ootd #fashion</div>
+      <div class="reel-music">🎵 Kesariya — Arijit Singh</div>
+    </div>
+
+    <!-- SHOP DOT — THE CORE FEATURE -->
+    <div class="shop-dot" id="shopDot" onclick="openShelf()">
+      <span class="shop-dot-icon">🛍️</span>
+      <span class="shop-dot-text">Shop this look</span>
+      <span class="shop-dot-count">3</span>
+    </div>
+
+    <!-- PRODUCT SHELF -->
+    <div class="product-shelf" id="productShelf">
+      <div class="shelf-handle"></div>
+      <div class="shelf-header">
+        <div class="shelf-title">Products in this Reel</div>
+        <button class="shelf-close" onclick="closeShelf()">✕</button>
+      </div>
+      <div class="shelf-sub">Identified by AI · Tap to buy without leaving Instagram</div>
+      <div class="ai-badge">✨ AI Identified · 94% confidence</div>
+
+      <!-- CREATOR EARNINGS -->
+      <div class="creator-earnings">
+        <span class="creator-earnings-icon">💰</span>
+        <div class="creator-earnings-text">
+          <strong>@stylebypriya earns commission</strong> on every purchase from this Reel
+        </div>
+      </div>
+
+      <!-- PRODUCT CARDS -->
+      <div class="products-scroll">
+        <div class="product-card selected" id="card-0" onclick="selectProduct(0)">
+          <div class="product-img" style="background:#f8f0ff">👗</div>
+          <div class="product-info">
+            <div class="product-brand">Zara</div>
+            <div class="product-name">Satin Wrap Midi Dress</div>
+            <div>
+              <span class="product-price">₹3,490</span>
+              <span class="product-original">₹4,990</span>
+            </div>
+            <div class="product-rating">⭐ 4.6 · 892 reviews</div>
+          </div>
+        </div>
+        <div class="product-card" id="card-1" onclick="selectProduct(1)">
+          <div class="product-img" style="background:#fff8f0">👜</div>
+          <div class="product-info">
+            <div class="product-brand">Charles & Keith</div>
+            <div class="product-name">Croc-Effect Shoulder Bag</div>
+            <div>
+              <span class="product-price">₹5,990</span>
+            </div>
+            <div class="product-rating">⭐ 4.4 · 341 reviews</div>
+          </div>
+        </div>
+        <div class="product-card" id="card-2" onclick="selectProduct(2)">
+          <div class="product-img" style="background:#f0f8ff">👠</div>
+          <div class="product-info">
+            <div class="product-brand">Steve Madden</div>
+            <div class="product-name">Block Heel Sandals</div>
+            <div>
+              <span class="product-price">₹4,299</span>
+              <span class="product-original">₹5,500</span>
+            </div>
+            <div class="product-rating">⭐ 4.5 · 567 reviews</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUY SECTION -->
+      <div class="buy-section">
+        <div class="selected-product-preview">
+          <div class="sel-img" id="selImg">👗</div>
+          <div class="sel-info">
+            <div class="sel-name" id="selName">Satin Wrap Midi Dress</div>
+            <div class="sel-price" id="selPrice">₹3,490</div>
+          </div>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em">Select Size</div>
+        <div class="size-row">
+          <button class="size-btn" onclick="selectSize(this)">XS</button>
+          <button class="size-btn selected" onclick="selectSize(this)">S</button>
+          <button class="size-btn" onclick="selectSize(this)">M</button>
+          <button class="size-btn" onclick="selectSize(this)">L</button>
+          <button class="size-btn" onclick="selectSize(this)">XL</button>
+        </div>
+
+        <button class="buy-btn" id="buyBtn" onclick="purchaseItem()">
+          <span>⚡</span> Buy Now · Meta Pay
+        </button>
+        <div class="meta-pay-badge">
+          🔒 Secured by Meta Pay · Free returns
+        </div>
+      </div>
+    </div>
+
+    <!-- SUCCESS OVERLAY -->
+    <div class="success-overlay" id="successOverlay">
+      <div class="success-card">
+        <span class="success-icon">🎉</span>
+        <div class="success-title">Order Placed!</div>
+        <div class="success-desc">
+          Your <strong id="orderName">Satin Wrap Midi Dress</strong> is on its way.<br>
+          Delivery in 3–5 days.<br><br>
+          <span style="color:var(--ig-purple);font-weight:600">@stylebypriya earned ₹419 commission 💜</span>
+        </div>
+        <button class="success-btn" onclick="closeSuccess()">Continue Watching</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="bnav" onclick="showToast('Home feed')"><span class="bnav-icon active">🏠</span></div>
+    <div class="bnav" onclick="showToast('Search & Explore')"><span class="bnav-icon">🔍</span></div>
+    <div class="bnav" onclick="showToast('Create Reel')"><span class="bnav-icon">➕</span></div>
+    <div class="bnav" onclick="showShopReel()"><span class="bnav-icon" id="shopReelNav">🛍️</span></div>
+    <div class="bnav" onclick="showToast('Your profile')"><span class="bnav-icon">👤</span></div>
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:24px;font-size:11px;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;font-family:'Inter',sans-serif">
+  CONCEPT PROTOTYPE · NOT AN OFFICIAL INSTAGRAM PRODUCT<br>
+  Shanit Nagre · AI Product Manager · shanitnagre.github.io
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#262626;color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:all 0.3s;pointer-events:none;z-index:9999;white-space:nowrap"></div>
+
+<script>
+const products = [
+  { name: 'Satin Wrap Midi Dress', price: '₹3,490', brand: 'Zara', img: '👗', commission: '₹419', bg: '#f8f0ff' },
+  { name: 'Croc-Effect Shoulder Bag', price: '₹5,990', brand: 'Charles & Keith', img: '👜', commission: '₹719', bg: '#fff8f0' },
+  { name: 'Block Heel Sandals', price: '₹4,299', brand: 'Steve Madden', img: '👠', commission: '₹516', bg: '#f0f8ff' },
+];
+
+const reels = [
+  { user: '@stylebypriya', caption: 'GRWM for a dinner date 🌙 outfit details below ✨ #ootd #fashion', bg: 'linear-gradient(160deg,#1a1a2e,#16213e,#0f3460,#533483)', emoji: '👗', products: 3 },
+  { user: '@sneakerhead.raj', caption: 'New drop just hit 🔥 these are FIRE #sneakers #nike', bg: 'linear-gradient(160deg,#0f2027,#203a43,#2c5364)', emoji: '👟', products: 2 },
+  { user: '@beauty.by.neha', caption: 'My full glam routine using only drugstore products 💄✨', bg: 'linear-gradient(160deg,#2d1b69,#11998e,#38ef7d)', emoji: '💄', products: 4 },
+];
+
+let currentReel = 0;
+let selectedProduct = 0;
+let isLiked = false;
+
+function switchReel(idx) {
+  document.querySelectorAll('.reel-nav-item').forEach((t,i) => t.classList.toggle('active', i === idx));
+  if(idx === 1) triggerNextReel();
+}
+
+function triggerNextReel() {
+  currentReel = (currentReel + 1) % reels.length;
+  const r = reels[currentReel];
+  document.getElementById('reelBg').style.background = r.bg;
+  document.getElementById('reelBg').textContent = r.emoji;
+  document.getElementById('reelUsername').textContent = r.user;
+  document.getElementById('reelCaption').textContent = r.caption;
+  document.querySelector('.shop-dot-count').textContent = r.products;
+  closeShelf();
+  // Show AI scanning
+  showAIScanning();
+}
+
+function showAIScanning() {
+  const el = document.getElementById('aiScanning');
+  const fill = document.getElementById('scanFill');
+  const dot = document.getElementById('shopDot');
+  el.classList.add('show');
+  dot.style.display = 'none';
+  fill.style.width = '0%';
+  setTimeout(() => fill.style.width = '100%', 100);
+  setTimeout(() => {
+    el.classList.remove('show');
+    dot.style.display = 'flex';
+    showToast('✨ AI found ' + reels[currentReel].products + ' products in this Reel');
+  }, 1800);
+}
+
+function openShelf() {
+  document.getElementById('productShelf').classList.add('open');
+}
+
+function closeShelf() {
+  document.getElementById('productShelf').classList.remove('open');
+}
+
+function selectProduct(idx) {
+  selectedProduct = idx;
+  document.querySelectorAll('.product-card').forEach((c,i) => c.classList.toggle('selected', i === idx));
+  const p = products[idx];
+  document.getElementById('selImg').textContent = p.img;
+  document.getElementById('selImg').style.background = p.bg;
+  document.getElementById('selName').textContent = p.name;
+  document.getElementById('selPrice').textContent = p.price;
+}
+
+function selectSize(btn) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function purchaseItem() {
+  const btn = document.getElementById('buyBtn');
+  btn.textContent = '⏳ Processing...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✅ Ordered!';
+    btn.classList.add('purchased');
+    const p = products[selectedProduct];
+    document.getElementById('orderName').textContent = p.name;
+    document.querySelector('.success-card .success-desc span').textContent = `@${reels[currentReel].user.replace('@','')} earned ${p.commission} commission 💜`;
+    setTimeout(() => {
+      document.getElementById('successOverlay').classList.add('show');
+    }, 600);
+  }, 1400);
+}
+
+function closeSuccess() {
+  document.getElementById('successOverlay').classList.remove('show');
+  closeShelf();
+  const btn = document.getElementById('buyBtn');
+  btn.textContent = '⚡ Buy Now · Meta Pay';
+  btn.disabled = false;
+  btn.classList.remove('purchased');
+  showToast('🎉 Order confirmed! Delivery in 3-5 days.');
+}
+
+function likeReel() {
+  isLiked = !isLiked;
+  document.getElementById('likeIcon').textContent = isLiked ? '❤️' : '♡';
+  document.getElementById('likeCount').textContent = isLiked ? '284,001' : '284K';
+}
+
+function showShopReel() {
+  showToast('✨ ShopReel — AI Commerce by Shanit Nagre');
+  document.getElementById('shopReelNav').style.filter = 'none';
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2500);
+}
+
+// Auto-show AI scanning on load
+setTimeout(showAIScanning, 1000);
+</script>
+</body>
+</html>
